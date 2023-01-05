@@ -39,7 +39,7 @@ async def create_task(task: Task, db: Session = Depends(get_db)):
 
     db.add(task_model)
     db.commit()
-    return {"message": "Task Criada com sucesso"}
+    return success_exception(201, task_model)
 
 
 @app.delete('/{id}')
@@ -47,11 +47,11 @@ async def delete_task(id: int, db: Session = Depends(get_db)):
     finded_task = db.query(models.Tasks).filter(models.Tasks.id == id).first()
 
     if finded_task is None:
-        raise HTTPException(status_code=404, detail="Task não encontrada")
+        raise http_exceptinon()
 
     db.query(models.Tasks).filter(models.Tasks.id == id).delete()
     db.commit()
-    return {"message": "Tarefa deletada com sucesso!"}
+    return success_exception(200)
 
 
 @app.get('/{id}')
@@ -59,8 +59,8 @@ async def get_task_by_id(id: int, db: Session = Depends(get_db)):
     task_finded = db.query(models.Tasks).filter(models.Tasks.id == id).first()
     print(task_finded)
     if task_finded is not None:
-        return task_finded
-    raise HTTPException(status_code=404, detail="Task não encontrada")
+        return success_exception(200, task_finded)
+    raise http_exceptinon()
 
 
 @app.put('/{id}')
@@ -68,7 +68,7 @@ async def update_task(id: int, task: Task, db: Session = Depends(get_db)):
     finded_task = db.query(models.Tasks).filter(models.Tasks.id == id).first()
 
     if finded_task is None:
-        raise HTTPException(status_code=404, detail="Task não encontrada")
+        raise http_exceptinon()
 
     finded_task.title = task.title
     finded_task.description = task.description
@@ -77,9 +77,21 @@ async def update_task(id: int, task: Task, db: Session = Depends(get_db)):
     db.add(finded_task)
     db.commit()
 
-    return {"message": "Tarefa atualizada com sucessso!"}
+    return success_exception(200, finded_task)
 
 
 @app.get('/tasks/{status}')
 async def get_tasks_by_status(status: int, db: Session = Depends(get_db)):
     return db.query(models.Tasks).filter(models.Tasks.status == status).all()
+
+
+def http_exceptinon():
+    return HTTPException(status_code=404, detail="Tarefa não encontrada")
+
+
+def success_exception(status_code: int, content=None):
+    return {
+        "status": status_code,
+        "message": "Sucesso!",
+        "content": content
+    }
