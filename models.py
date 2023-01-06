@@ -8,4 +8,4 @@ class Tasks(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
     description = Column(String)
-    status = Column(Integer)
+    state = Column(Integer)

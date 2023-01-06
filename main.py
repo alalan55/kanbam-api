@@ -1,5 +1,6 @@
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -7,14 +8,22 @@ from pydantic import BaseModel, Field
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 models.Base.metadata.create_all(bind=engine)
 
 
 class Task(BaseModel):
     title: str
     description: Optional[str]
-    status: int = Field(
-        gt=-1, lt=4, description="O status deve estar entre 1 e 3")
+    state: int = Field(
+        gt=-1, lt=3, description="O estado deve estar entre 1 e 3")
 
 
 def get_db():
@@ -35,7 +44,7 @@ async def create_task(task: Task, db: Session = Depends(get_db)):
     task_model = models.Tasks()
     task_model.title = task.title
     task_model.description = task.description
-    task_model.status = task.status
+    task_model.state = task.state
 
     db.add(task_model)
     db.commit()
@@ -72,7 +81,7 @@ async def update_task(id: int, task: Task, db: Session = Depends(get_db)):
 
     finded_task.title = task.title
     finded_task.description = task.description
-    finded_task.status = task.status
+    finded_task.state = task.state
 
     db.add(finded_task)
     db.commit()
@@ -80,9 +89,9 @@ async def update_task(id: int, task: Task, db: Session = Depends(get_db)):
     return success_exception(200, finded_task)
 
 
-@app.get('/tasks/{status}')
-async def get_tasks_by_status(status: int, db: Session = Depends(get_db)):
-    return db.query(models.Tasks).filter(models.Tasks.status == status).all()
+@app.get('/tasks/{state}')
+async def get_tasks_by_status(state: int, db: Session = Depends(get_db)):
+    return db.query(models.Tasks).filter(models.Tasks.state == state).all()
 
 
 def http_exceptinon():
