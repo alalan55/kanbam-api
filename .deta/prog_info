@@ -1,0 +1,1 @@
+{"id":"b8688a2b-43d3-455a-abc6-27f1f397a8b3","space":47633,"runtime":"python3.9","name":"kanban-api","path":"tjyasq","project":"e0noccse","account":"144798365827","region":"sa-east-1","deps":["fastapi","uvicorn","sqlalchemy"],"envs":null,"public":true,"log_level":"debug","cron":""}
