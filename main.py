@@ -46,9 +46,10 @@ async def create_task(task: Task, db: Session = Depends(get_db)):
     task_model.description = task.description
     task_model.state = task.state
 
+    print(task_model)
     db.add(task_model)
     db.commit()
-    return success_exception(201, task_model)
+    return success_response(201, task)
 
 
 @app.delete('/{id}')
@@ -60,7 +61,7 @@ async def delete_task(id: int, db: Session = Depends(get_db)):
 
     db.query(models.Tasks).filter(models.Tasks.id == id).delete()
     db.commit()
-    return success_exception(200)
+    return success_response(200)
 
 
 @app.get('/{id}')
@@ -68,7 +69,7 @@ async def get_task_by_id(id: int, db: Session = Depends(get_db)):
     task_finded = db.query(models.Tasks).filter(models.Tasks.id == id).first()
     print(task_finded)
     if task_finded is not None:
-        return success_exception(200, task_finded)
+        return success_response(200, task_finded)
     raise http_exceptinon()
 
 
@@ -86,7 +87,7 @@ async def update_task(id: int, task: Task, db: Session = Depends(get_db)):
     db.add(finded_task)
     db.commit()
 
-    return success_exception(200, finded_task)
+    return success_response(200, finded_task)
 
 
 @app.get('/tasks/{state}')
@@ -98,7 +99,7 @@ def http_exceptinon():
     return HTTPException(status_code=404, detail="Tarefa não encontrada")
 
 
-def success_exception(status_code: int, content=None):
+def success_response(status_code: int, content: Optional[dict] = None):
     return {
         "status": status_code,
         "message": "Sucesso!",
