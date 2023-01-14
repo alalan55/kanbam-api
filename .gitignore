@@ -1,0 +1,5 @@
+__pycache__
+kanbanenv
+.DS_Store
+.vscode
+.env
