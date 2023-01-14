@@ -46,7 +46,6 @@ async def create_task(task: Task, db: Session = Depends(get_db)):
     task_model.description = task.description
     task_model.state = task.state
 
-    print(task_model)
     db.add(task_model)
     db.commit()
     return success_response(201, task)
@@ -67,7 +66,7 @@ async def delete_task(id: int, db: Session = Depends(get_db)):
 @app.get('/{id}')
 async def get_task_by_id(id: int, db: Session = Depends(get_db)):
     task_finded = db.query(models.Tasks).filter(models.Tasks.id == id).first()
-    print(task_finded)
+
     if task_finded is not None:
         return success_response(200, task_finded)
     raise http_exceptinon()
